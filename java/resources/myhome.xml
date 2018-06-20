@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+    
+<sqlMap namespace="MYHOME">
+
+	<select id="selectIrKey" resultClass="hmap">
+		select	ir_key as irKey
+		       ,dev_id as devId
+		from	action_target_ir
+		where   action_val = #actionVal#
+		and     target_val = #targetVal#
+	</select>
+
+	<select id="selectTopic" resultClass="hmap">
+		select	dev_nm as devNm
+		       ,pub_topic as pubTopic
+		       ,sub_topic as subTopic	
+		from	dev_mgmt
+		where   dev_id = #devId#
+		limit 1
+	</select>
+
+	<select id="selectQRInfo" resultClass="hmap">
+        select   com.*,
+                 svr.*
+        from    (
+                 select  max(ssid) as ssid,
+                         max(pwd) as pwd,
+                         max(l_server) as l_server,
+                         max(mqtt_port) as mqtt_port,
+                         max(mqtt_user) as mqtt_user,
+                         max(mqtt_pwd) as mqtt_pwd
+                 from    (
+                          SELECT if(cd_id = 'SSID', cd_val, null) as ssid,
+                                 if(cd_id = 'PWD', cd_val, null) as pwd,
+                                 if(cd_id = 'SERVER', cd_val, null) as l_server,
+                                 if(cd_id = 'PORT', cd_val, null) as mqtt_port,
+                                 if(cd_id = 'USERNAME', cd_val, null) as mqtt_user,
+                                 if(cd_id = 'PASSWORD', cd_val, null) as mqtt_pwd
+                          FROM com_code_dtl
+                          where com_cd in ('CM0001', 'CM0002')
+                         ) a
+                ) com,
+                (
+                 SELECT dev_id
+                 FROM   dev_mgmt
+                 where  dev_id = #identity#
+                ) svr
+	</select>
+
+	<select id="selectDeviceList" resultClass="hmap">
+		SELECT  dev_id
+		       ,dev_nm
+		       ,date_format(ifnull(lst_con_dtm,'00000000000000'),'%Y/%m/%d %H:%i:%S') as lst_con_dtm
+		       ,sub_topic
+		FROM   dev_mgmt
+		ORDER BY dev_nm
+	</select>
+
+	<update id="updateIrKey" parameterClass="hmap">
+		UPDATE ir_raw
+		SET  rcntr_type   = #rcntrType# 
+		    ,rcntr_val    = #rcntrVal# 
+		    ,raw_data_len = #rawDataLen# 
+		    ,raw_data     = #rawData# 
+		WHERE rcntr_key   = #rcntrKey#
+	</update>
+
+	<select id="selectIrKeyList" resultClass="hmap">
+	
+		select	rcntr_key as rcntrKey
+		from	ir_raw
+		order by rcntr_key	
+	
+	</select>
+
+	<select id="selectIrDataSingle" resultClass="hmap">
+	
+		select	raw_data_len as rawDataLen
+			   ,raw_data as rawData
+		from	ir_raw
+		where   rcntr_key = #key#	
+	
+	</select>
+
+	<select id="selectIrData" resultClass="hmap">
+	
+		select	raw_data_len as rawDataLen
+			   ,raw_data as rawData
+		from	ir_raw
+		where   rcntr_key in	
+		<iterate open="(" close=")" property="key" conjunction=",">
+		#key[]#
+		</iterate>
+	
+	</select>
+
+	<delete id="deleteSong" parameterClass="hmap">
+		delete from songs
+	</delete>
+	
+    <insert id="insertSong" parameterClass="hmap">
+        INSERT INTO songs (
+        	 id
+        	,fname
+        	,title
+        	,artist
+        	,album
+        	,genre
+        	,type
+        ) VALUES (
+        	 #id#
+        	,#fname#
+        	,#title#
+        	,#artist#
+        	,#album#
+        	,#genre#
+        	,#type#
+        )    
+    </insert>
+
+
+	<select id="selectSong" resultClass="hmap">
+		select  id
+		       ,artist
+			   ,title
+		from 	songs
+		where	type = 'mp3'
+		<isNotEmpty property="artist" prepend="AND">
+			artist = #artist#
+		</isNotEmpty>
+		<isNotEmpty property="title" prepend="AND">
+			title = #title#
+		</isNotEmpty>
+	</select>
+
+</sqlMap>
