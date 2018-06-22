@@ -1,0 +1,51 @@
+<project name="SimpleFrameLibrary" default="all" basedir=".">
+	<!-- 디렉토리 정보 -->
+	<property name="source" location="src" />
+	<property name="lib" location="lib" />
+	<property name="class" location="bin" />
+	<property name="dist" location="dist" />
+	<property name="deploy" location="deploy" />
+
+	<!-- 기본 타겟 -->
+	<target name="all" depends="init">
+		<echo>작업완료 !!!</echo>
+	</target>
+
+	<!-- 초기화 -->
+	<target name="init" description="Initialize">
+		<mkdir dir="${dist}"/>
+		<mkdir dir="${deploy}"/>
+
+		<!-- Create the time stamp -->
+	    <tstamp/>
+	</target>
+
+	<!-- Jar 파일을 만든다 -->
+	<target name="makeJAR" description="JAR 만들기">
+		<delete dir="${dist}"/>
+		<mkdir dir="${dist}/src"/>
+		<mkdir dir="${dist}/cls"/>
+
+		<!-- 파일 복사 -->
+		<copy todir="${dist}/src" overwrite="true">
+			<fileset dir="${source}" />
+		</copy>
+
+		<!-- 컴파일 -->
+		<javac destdir="${dist}/cls" debug="true" srcdir="${dist}/src" verbose="false" target="1.7" includeantruntime="true" >
+			<classpath>
+				<pathelement location="${lib}/conversation-5.1.1.jar" />
+				<pathelement location="${lib}/core-5.1.1.jar" />
+				<pathelement location="${lib}/geronimo-servlet_3.0_spec-1.0.jar" />
+				<pathelement location="${lib}/gson-2.8.0.jar" />
+				<pathelement location="${lib}/ST4-4.0.8.jar" />
+			</classpath>
+		</javac>
+
+		<jar destfile="${deploy}/SFA.jar" basedir="${dist}/cls">
+		  <manifest>
+		    <attribute name="Built-By" value="최의신"/>
+		  </manifest>
+		</jar>
+	</target>	
+</project>
