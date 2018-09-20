@@ -17,12 +17,22 @@ import com.klab.svc.AppsPropertiy;
  */
 public class WatsonTTS implements ITts
 {
-	TextToSpeech service;
+	private TextToSpeech service;
+	private String voice;
 	
 	public WatsonTTS()
 	{
 		service = new TextToSpeech();
-		service.setUsernameAndPassword(AppsPropertiy.getInstance().getProperty("tts.watson.user"), AppsPropertiy.getInstance().getProperty("tts.watson.passwd")); 
+		service.setUsernameAndPassword(AppsPropertiy.getInstance().getProperty("tts.watson.user"), AppsPropertiy.getInstance().getProperty("tts.watson.passwd"));
+		
+		voice = AppsPropertiy.getInstance().getProperty("tts.voice");
+		if ( voice == null ) {
+			voice = Voice.EN_US_ALLISONVOICE;
+		}
+		else {
+			if ( "youngmi_yuna".indexOf(voice) != - 1)
+				service.setEndPoint("https://stream.aibril-watson.kr/text-to-speech/api");
+		}
 	}
 	
 	@Override
@@ -37,7 +47,7 @@ public class WatsonTTS implements ITts
         	SynthesizeOptions opt = new SynthesizeOptions.Builder()
         			.text(text)
         			.accept(Accept.AUDIO_WAV)
-        			.voice(Voice.EN_US_ALLISONVOICE)
+        			.voice(voice)
         			.build();
         	InputStream stream = service.synthesize(opt).execute();
         	is = WaveUtils. reWriteWaveHeader(stream);
