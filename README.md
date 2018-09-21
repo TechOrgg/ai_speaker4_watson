@@ -4,7 +4,7 @@ Watson을 이용한 인공지능 스피커
 MEETUP_인공지능_스피커_발표.pdf
 
 # 인공지능 스피커 만들기
-My AI Speaker for Watson_v1_5.docx 파일을 참조.
+My AI Speaker for Watson_v1_6.docx 파일을 참조. (AIBRIL 한글 TTS 사용)
 
 # 오픈일정
 My AI Speaker for Watson_v1_5.docx => 완료<br>
